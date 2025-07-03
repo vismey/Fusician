@@ -317,6 +317,12 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useLocalStorage<GeneratedData[]>('fuse-it-history', []);
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   const handleFuseSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -347,8 +353,11 @@ export default function Home() {
     } else {
       const newResult: GeneratedData = {
         id: new Date().toISOString(),
-        ...response,
         items: items,
+        productName: response.productName,
+        features: response.features || [],
+        slogans: response.slogans || [],
+        posterDataUri: response.posterDataUri || '',
       };
       setResult(newResult);
       setHistory([newResult, ...history].slice(0, 10)); // Keep history to 10 items
@@ -377,7 +386,7 @@ export default function Home() {
         <Header />
         <main className="grid lg:grid-cols-3 gap-8 mt-6">
           <aside className="lg:col-span-1 hidden lg:block">
-            <HistoryView history={history} onSelect={handleSelectHistory} onClear={handleClearHistory} />
+            {isClient && <HistoryView history={history} onSelect={handleSelectHistory} onClear={handleClearHistory} />}
           </aside>
           <section className="lg:col-span-2">
             <AnimatePresence mode="wait">
