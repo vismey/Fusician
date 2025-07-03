@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -42,10 +43,12 @@ function Header() {
        <div className="absolute top-6 right-0">
         <ThemeToggle />
       </div>
-      <h1 className="text-5xl md:text-6xl font-bold text-center flex items-center justify-center gap-3 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-        <Wand2 className="w-12 h-12 text-primary" />
-        Fuse It!
-      </h1>
+      <Link href="/" className="inline-block cursor-pointer">
+        <h1 className="text-5xl md:text-6xl font-bold text-center flex items-center justify-center gap-3 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+          <Wand2 className="w-12 h-12 text-primary" />
+          Fuse It!
+        </h1>
+      </Link>
       <p className="text-muted-foreground mt-3 text-lg">
         Generate quirky product ideas from any ingredients!
       </p>
