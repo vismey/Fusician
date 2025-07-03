@@ -9,12 +9,11 @@ import { Wand2, ArrowRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const exampleIngredients = [
-  ['A Pocket Watch', 'A Nebula'],
-  ['A Bonsai Tree', 'A Thunderstorm'],
-  ['An Old Library', 'A Spaceship'],
-  ['A Hummingbird', 'A Sword'],
-  ['A Secret Agent', 'A Croissant'],
-  ['A Volcano', 'A Music Box'],
+  ['Apple', 'Car'],
+  ['Cat', 'Laptop'],
+  ['Book', 'Coffee'],
+  ['Moon', 'Bicycle'],
+  ['Guitar', 'Plant'],
 ];
 
 export default function Home() {
