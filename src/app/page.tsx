@@ -72,7 +72,9 @@ export default function Home() {
               </Card>
             </motion.div>
           </AnimatePresence>
-          <span className="text-primary font-bold text-4xl">+</span>
+          <Link href={`/fuse?ingredient1=${encodeURIComponent(item1)}&ingredient2=${encodeURIComponent(item2)}`} passHref>
+            <span className="text-primary font-bold text-4xl cursor-pointer hover:scale-125 transition-transform duration-200">+</span>
+          </Link>
           <AnimatePresence mode="wait">
             <motion.div
               key={item2}
