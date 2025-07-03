@@ -389,21 +389,27 @@ export default function Home() {
             {isClient && <HistoryView history={history} onSelect={handleSelectHistory} onClear={handleClearHistory} />}
           </aside>
           <section className="lg:col-span-2">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={result ? 'result' : 'form'}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                {result ? (
-                  <ResultView result={result} onBack={handleClearResult} />
-                ) : (
-                  <FuseForm onSubmit={handleFuseSubmit} isLoading={isLoading} />
-                )}
-              </motion.div>
-            </AnimatePresence>
+            {isClient ? (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={result ? 'result' : 'form'}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {result ? (
+                    <ResultView result={result} onBack={handleClearResult} />
+                  ) : (
+                    <FuseForm onSubmit={handleFuseSubmit} isLoading={isLoading} />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            ) : (
+              <Card className="shadow-2xl rounded-2xl flex items-center justify-center h-[500px]">
+                <Loader2 className="h-16 w-16 animate-spin text-primary" />
+              </Card>
+            )}
           </section>
         </main>
       </div>
