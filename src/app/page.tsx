@@ -86,7 +86,7 @@ function HistoryView({ history, onSelect, onClear }: { history: GeneratedData[],
                       />
                       <div className="flex-1">
                         <p className="font-semibold text-sm group-hover:text-primary">{item.productName}</p>
-                        <p className="text-xs text-muted-foreground">{item.items.join(' + ')}</p>
+                        <p className="text-xs text-muted-foreground">{Array.isArray(item.items) ? item.items.join(' + ') : ''}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -249,7 +249,7 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
                 <Card className="shadow-2xl rounded-2xl w-full text-center">
                     <CardHeader>
                         <CardTitle className="text-4xl font-bold">{result.productName}</CardTitle>
-                        <CardDescription>A fusion of {result.items.map(item => `'${item}'`).join(' and ')}</CardDescription>
+                        <CardDescription>A fusion of {Array.isArray(result.items) ? result.items.map(item => `'${item}'`).join(' and ') : ''}</CardDescription>
                     </CardHeader>
                 </Card>
             </div>
@@ -389,27 +389,27 @@ export default function Home() {
             {isClient && <HistoryView history={history} onSelect={handleSelectHistory} onClear={handleClearHistory} />}
           </aside>
           <section className="lg:col-span-2">
-            {isClient ? (
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={result ? 'result' : 'form'}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {result ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={result ? 'result' : 'form'}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {isClient ? (
+                  result ? (
                     <ResultView result={result} onBack={handleClearResult} />
                   ) : (
                     <FuseForm onSubmit={handleFuseSubmit} isLoading={isLoading} />
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            ) : (
-              <Card className="shadow-2xl rounded-2xl flex items-center justify-center h-[500px]">
-                <Loader2 className="h-16 w-16 animate-spin text-primary" />
-              </Card>
-            )}
+                  )
+                ) : (
+                  <Card className="shadow-2xl rounded-2xl flex items-center justify-center h-[500px]">
+                    <Loader2 className="h-16 w-16 animate-spin text-primary" />
+                  </Card>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </section>
         </main>
       </div>
