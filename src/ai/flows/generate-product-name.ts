@@ -12,7 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateProductNameInputSchema = z.object({
-  items: z.array(z.string()).describe('The list of items to fuse.'),
+  items: z.array(z.string()).describe('The list of ingredients to fuse.'),
 });
 export type GenerateProductNameInput = z.infer<typeof GenerateProductNameInputSchema>;
 
@@ -29,7 +29,7 @@ const prompt = ai.definePrompt({
   name: 'generateProductNamePrompt',
   input: {schema: GenerateProductNameInputSchema},
   output: {schema: GenerateProductNameOutputSchema},
-  prompt: `You are a creative product naming expert. Given a list of items, generate a quirky and funny product name that combines the essence of all items.\n\nItems:\n{{#each items}}- {{{this}}}\n{{/each}}\n\nProduct Name:`,
+  prompt: `You are a creative product naming expert. Given a list of ingredients, generate a quirky and funny product name that combines the essence of all items.\n\nIngredients:\n{{#each items}}- {{{this}}}\n{{/each}}\n\nProduct Name:`,
 });
 
 const generateProductNameFlow = ai.defineFlow(

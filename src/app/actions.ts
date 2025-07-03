@@ -19,7 +19,7 @@ export async function fuseItems(items: string[]): Promise<Partial<FuseResult> & 
   try {
     const nonEmptyItems = items.filter(item => item && item.trim() !== '');
     if (nonEmptyItems.length < 2) {
-      return { error: 'Please provide at least two items to fuse.' };
+      return { error: 'Please provide at least two ingredients to fuse.' };
     }
 
     const nameResult = await generateProductName({ items: nonEmptyItems });

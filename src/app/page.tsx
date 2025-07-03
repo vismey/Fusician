@@ -43,7 +43,7 @@ function Header() {
         Fuse It!
       </h1>
       <p className="text-muted-foreground mt-3 text-lg">
-        Generate quirky product ideas from any two items!
+        Generate quirky product ideas from any two ingredients!
       </p>
     </header>
   );
@@ -118,7 +118,7 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
     <Card className="shadow-2xl rounded-2xl">
       <CardHeader>
         <CardTitle>Create a new fusion</CardTitle>
-        <CardDescription>What items should we fuse today?</CardDescription>
+        <CardDescription>What ingredients should we fuse today?</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -129,7 +129,7 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
                 name="item1"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg">Item 1</FormLabel>
+                    <FormLabel className="text-lg">Ingredient 1</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., Apple" {...field} className="py-6 text-lg rounded-xl" />
                     </FormControl>
@@ -142,7 +142,7 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
                 name="item2"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg">Item 2</FormLabel>
+                    <FormLabel className="text-lg">Ingredient 2</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., Car" {...field} className="py-6 text-lg rounded-xl" />
                     </FormControl>
@@ -156,7 +156,7 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
                   name="item3"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-lg">Item 3</FormLabel>
+                      <FormLabel className="text-lg">Ingredient 3</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., Sunglasses" {...field} className="py-6 text-lg rounded-xl" />
                       </FormControl>
@@ -171,7 +171,7 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
                   name="item4"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-lg">Item 4</FormLabel>
+                      <FormLabel className="text-lg">Ingredient 4</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., Book" {...field} className="py-6 text-lg rounded-xl" />
                       </FormControl>
@@ -185,7 +185,7 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
               <div className="flex justify-center">
                 <Button type="button" variant="outline" onClick={() => setItemCount(prev => prev + 1)}>
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Add another item
+                  Add another ingredient
                 </Button>
               </div>
             )}
@@ -334,8 +334,8 @@ export default function Home() {
       setIsLoading(false);
       toast({
         variant: 'destructive',
-        title: 'Not enough items',
-        description: 'Please provide at least two items to fuse.',
+        title: 'Not enough ingredients',
+        description: 'Please provide at least two ingredients to fuse.',
       });
       return;
     }
