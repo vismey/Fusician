@@ -259,13 +259,31 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
                     <CardTitle className="flex items-center gap-2"><Lightbulb /> Features</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <ul className="space-y-3">
-                        {result.features.map((feature, i) => (
-                            <li key={i} className="flex items-start gap-3">
-                                <Sparkles className="w-5 h-5 text-primary mt-1 shrink-0" />
-                                <span>{feature}</span>
-                            </li>
-                        ))}
+                    <ul className="space-y-6">
+                        {result.features.map((feature, i) => {
+                            const isNewFormat = typeof feature === 'object' && feature !== null && 'text' in feature;
+                            const featureText = isNewFormat ? (feature as {text: string}).text : feature as string;
+                            const featureImage = isNewFormat ? (feature as {image: string}).image : null;
+
+                            return (
+                                <li key={i} className="flex flex-col items-start gap-3">
+                                    {featureImage && (
+                                        <Image
+                                            src={featureImage}
+                                            alt={featureText}
+                                            width={400}
+                                            height={400}
+                                            className="rounded-lg border-2 border-secondary shadow-md w-full"
+                                            data-ai-hint="product feature"
+                                        />
+                                    )}
+                                    <div className="flex items-start gap-3 pt-2">
+                                        <Sparkles className="w-5 h-5 text-primary mt-1 shrink-0" />
+                                        <span>{featureText}</span>
+                                    </div>
+                                </li>
+                            );
+                        })}
                     </ul>
                 </CardContent>
             </Card>

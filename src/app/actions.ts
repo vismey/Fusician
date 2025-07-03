@@ -4,11 +4,17 @@ import { generateProductName } from '@/ai/flows/generate-product-name';
 import { generateProductFeatures } from '@/ai/flows/generate-product-features';
 import { generateMarketingSlogans } from '@/ai/flows/generate-marketing-slogans';
 import { generateProductPoster } from '@/ai/flows/generate-product-poster';
+import { generateFeatureImage } from '@/ai/flows/generate-feature-image';
 import { z } from 'zod';
+
+const FeatureSchema = z.object({
+  text: z.string(),
+  image: z.string(),
+});
 
 const FuseResultSchema = z.object({
   productName: z.string(),
-  features: z.array(z.string()),
+  features: z.array(z.union([FeatureSchema, z.string()])),
   slogans: z.array(z.string()),
   posterDataUri: z.string(),
 });
@@ -33,9 +39,21 @@ export async function fuseItems(items: string[]): Promise<Partial<FuseResult> & 
     if (!featuresResult.features || featuresResult.features.length === 0) {
         return { error: 'Could not generate product features.' };
     }
-    const features = featuresResult.features;
+    const featureStrings = featuresResult.features;
 
-    const slogansResult = await generateMarketingSlogans({ productName, productFeatures: features });
+    // Generate images for features in parallel
+    const featureImagePromises = featureStrings.map(featureText =>
+      generateFeatureImage({ productName, feature: featureText })
+    );
+
+    const featureImageResults = await Promise.all(featureImagePromises);
+
+    const features = featureStrings.map((text, index) => ({
+        text,
+        image: featureImageResults[index].imageDataUri
+    }));
+
+    const slogansResult = await generateMarketingSlogans({ productName, productFeatures: featureStrings });
     if (!slogansResult.slogans || slogansResult.slogans.length === 0) {
         return { error: 'Could not generate marketing slogans.' };
     }
