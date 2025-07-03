@@ -22,6 +22,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { fuseItems, FuseResult } from '@/app/actions';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 import { Sparkles, Lightbulb, Download, Share2, Loader2, Wand2, History as HistoryIcon, ArrowLeft, PlusCircle } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -37,7 +38,10 @@ const formSchema = z.object({
 
 function Header() {
   return (
-    <header className="py-6 text-center">
+    <header className="py-6 text-center relative">
+       <div className="absolute top-6 right-0">
+        <ThemeToggle />
+      </div>
       <h1 className="text-5xl md:text-6xl font-bold text-center flex items-center justify-center gap-3 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
         <Wand2 className="w-12 h-12 text-primary" />
         Fuse It!

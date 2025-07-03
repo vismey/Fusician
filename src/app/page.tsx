@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Wand2, ArrowRight } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const exampleIngredients = [
   ['A Cat', 'A Toaster'],
@@ -30,6 +31,9 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 text-center">
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
