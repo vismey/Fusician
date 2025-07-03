@@ -3,28 +3,32 @@
 import { useState, useEffect } from 'react';
 
 function useLocalStorage<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === 'undefined') {
-      return initialValue;
-    }
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  // On mount, read from localStorage
+  useEffect(() => {
+    setHasMounted(true);
     try {
       const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      if (item) {
+        setStoredValue(JSON.parse(item));
+      }
     } catch (error) {
-      console.error(error);
-      return initialValue;
+      console.log(error);
     }
-  });
+  }, [key]);
 
+  // When storedValue changes, and we've mounted, update localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-        try {
-            window.localStorage.setItem(key, JSON.stringify(storedValue));
-        } catch (error) {
-            console.error(error);
-        }
+    if (hasMounted) {
+      try {
+        window.localStorage.setItem(key, JSON.stringify(storedValue));
+      } catch (error) {
+        console.error(error);
+      }
     }
-  }, [key, storedValue]);
+  }, [key, storedValue, hasMounted]);
 
   return [storedValue, setStoredValue];
 }
