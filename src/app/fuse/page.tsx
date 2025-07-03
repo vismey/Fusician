@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -108,9 +109,18 @@ function HistoryView({ history, onSelect, onClear }: { history: GeneratedData[],
 }
 
 function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof formSchema>) => void, isLoading: boolean }) {
+  const searchParams = useSearchParams();
+  const ingredient1 = searchParams.get('ingredient1') || '';
+  const ingredient2 = searchParams.get('ingredient2') || '';
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { ingredient1: '', ingredient2: '', ingredient3: '', ingredient4: '' },
+    defaultValues: { 
+      ingredient1, 
+      ingredient2, 
+      ingredient3: '', 
+      ingredient4: '' 
+    },
   });
   
   const [itemCount, setItemCount] = useState(2);
@@ -284,7 +294,7 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
                                             data-ai-hint="product feature"
                                         />
                                     )}
-                                    <div className="flex items-start gap-3 max-w-xs text-center">
+                                    <div className="flex items-start justify-center gap-3 max-w-xs text-center">
                                         <Sparkles className="w-5 h-5 text-primary mt-1 shrink-0" />
                                         <span>{featureText}</span>
                                     </div>
@@ -337,7 +347,7 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
   );
 }
 
-export default function FusePage() {
+function FusePageContent() {
   const [result, setResult] = useState<GeneratedData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useLocalStorage<GeneratedData[]>('fuse-it-history', []);
@@ -440,4 +450,47 @@ export default function FusePage() {
       </div>
     </div>
   );
+}
+
+function FusePageLoader() {
+    return (
+         <div className="bg-background min-h-screen">
+            <div className="container mx-auto px-4 py-2">
+                <Header />
+                <main className="grid lg:grid-cols-3 gap-8 mt-6">
+                    <aside className="lg:col-span-1 hidden lg:block">
+                         <Card className="shadow-lg h-full">
+                            <CardHeader>
+                                <div className="flex justify-between items-center">
+                                <CardTitle className="flex items-center gap-2">
+                                    <HistoryIcon className="w-6 h-6" />
+                                    History
+                                </CardTitle>
+                                </div>
+                                <CardDescription>Your past creations.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-center text-muted-foreground py-16">
+                                    <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </aside>
+                     <section className="lg:col-span-2">
+                        <Card className="shadow-2xl rounded-2xl flex items-center justify-center h-[500px]">
+                            <Loader2 className="h-16 w-16 animate-spin text-primary" />
+                        </Card>
+                     </section>
+                </main>
+            </div>
+        </div>
+    )
+}
+
+export default function FusePage() {
+    return (
+        <Suspense fallback={<FusePageLoader />}>
+            <FusePageContent />
+        </Suspense>
+    )
 }

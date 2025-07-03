@@ -5,15 +5,18 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Wand2, ArrowRight } from 'lucide-react';
+import { Wand2, ArrowRight, Rocket } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const exampleIngredients = [
-  ['Apple', 'Car'],
   ['Cat', 'Laptop'],
   ['Book', 'Coffee'],
   ['Moon', 'Bicycle'],
   ['Guitar', 'Plant'],
+  ['Dragon', 'Ice Cream'],
+  ['Robot', 'Sushi'],
+  ['Cloud', 'Keyboard'],
+  ['Submarine', 'Pineapple'],
 ];
 
 export default function Home() {
@@ -90,13 +93,19 @@ export default function Home() {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1, ease: 'easeOut' }}
-        className="mt-16"
+        className="mt-16 flex flex-col sm:flex-row items-center gap-6"
       >
         <Link href="/fuse" passHref>
           <Button size="lg" className="rounded-full px-12 py-8 text-2xl font-bold shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95">
-            Start Fusing Now
+            Start Fusing
             <ArrowRight className="ml-3 h-7 w-7" />
           </Button>
+        </Link>
+        <Link href={`/fuse?ingredient1=${encodeURIComponent(item1)}&ingredient2=${encodeURIComponent(item2)}`} passHref>
+            <Button size="lg" variant="outline" className="rounded-full px-10 py-7 text-xl font-bold shadow-md transform transition-transform duration-200 hover:scale-105 active:scale-95">
+                Fuse These!
+                <Rocket className="ml-3 h-6 w-6" />
+            </Button>
         </Link>
       </motion.div>
     </div>
