@@ -23,14 +23,16 @@ import { useToast } from '@/hooks/use-toast';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { fuseItems, FuseResult } from '@/app/actions';
 
-import { Sparkles, Lightbulb, Download, Share2, Loader2, Wand2, History as HistoryIcon, ArrowLeft } from 'lucide-react';
+import { Sparkles, Lightbulb, Download, Share2, Loader2, Wand2, History as HistoryIcon, ArrowLeft, PlusCircle } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
-type GeneratedData = FuseResult & { id: string; item1: string; item2: string; };
+type GeneratedData = FuseResult & { id: string; items: string[]; };
 
 const formSchema = z.object({
   item1: z.string().min(2, { message: 'Must be at least 2 characters.' }),
   item2: z.string().min(2, { message: 'Must be at least 2 characters.' }),
+  item3: z.string().optional(),
+  item4: z.string().optional(),
 });
 
 function Header() {
@@ -84,7 +86,7 @@ function HistoryView({ history, onSelect, onClear }: { history: GeneratedData[],
                       />
                       <div className="flex-1">
                         <p className="font-semibold text-sm group-hover:text-primary">{item.productName}</p>
-                        <p className="text-xs text-muted-foreground">{item.item1} + {item.item2}</p>
+                        <p className="text-xs text-muted-foreground">{item.items.join(' + ')}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -101,9 +103,10 @@ function HistoryView({ history, onSelect, onClear }: { history: GeneratedData[],
 function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof formSchema>) => void, isLoading: boolean }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { item1: '', item2: '' },
+    defaultValues: { item1: '', item2: '', item3: '', item4: '' },
   });
   
+  const [itemCount, setItemCount] = useState(2);
   const [isButtonAnimating, setIsButtonAnimating] = useState(false);
 
   const handleAnimate = () => {
@@ -115,12 +118,12 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
     <Card className="shadow-2xl rounded-2xl">
       <CardHeader>
         <CardTitle>Create a new fusion</CardTitle>
-        <CardDescription>What two items should we fuse today?</CardDescription>
+        <CardDescription>What items should we fuse today?</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="grid md:grid-cols-2 gap-6 items-center">
+            <div className="grid md:grid-cols-2 gap-6 items-start">
               <FormField
                 control={form.control}
                 name="item1"
@@ -147,7 +150,45 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
                   </FormItem>
                 )}
               />
+              {itemCount >= 3 && (
+                 <FormField
+                  control={form.control}
+                  name="item3"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-lg">Item 3</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Sunglasses" {...field} className="py-6 text-lg rounded-xl" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+               {itemCount >= 4 && (
+                 <FormField
+                  control={form.control}
+                  name="item4"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-lg">Item 4</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Book" {...field} className="py-6 text-lg rounded-xl" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
+             {itemCount < 4 && (
+              <div className="flex justify-center">
+                <Button type="button" variant="outline" onClick={() => setItemCount(prev => prev + 1)}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add another item
+                </Button>
+              </div>
+            )}
             <div className="relative flex justify-center pt-4">
               <Button type="submit" size="lg" disabled={isLoading} className="rounded-full px-12 py-8 text-2xl font-bold shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95" onClick={handleAnimate}>
                 {isLoading ? (
@@ -208,7 +249,7 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
                 <Card className="shadow-2xl rounded-2xl w-full text-center">
                     <CardHeader>
                         <CardTitle className="text-4xl font-bold">{result.productName}</CardTitle>
-                        <CardDescription>A fusion of '{result.item1}' and '{result.item2}'</CardDescription>
+                        <CardDescription>A fusion of {result.items.map(item => `'${item}'`).join(' and ')}</CardDescription>
                     </CardHeader>
                 </Card>
             </div>
@@ -281,7 +322,19 @@ export default function Home() {
     setIsLoading(true);
     setResult(null);
 
-    const response = await fuseItems(values.item1, values.item2);
+    const items = [values.item1, values.item2, values.item3, values.item4].filter((v): v is string => !!v && v.trim().length > 0);
+
+    if (items.length < 2) {
+      setIsLoading(false);
+      toast({
+        variant: 'destructive',
+        title: 'Not enough items',
+        description: 'Please provide at least two items to fuse.',
+      });
+      return;
+    }
+
+    const response = await fuseItems(items);
 
     setIsLoading(false);
 
@@ -295,8 +348,7 @@ export default function Home() {
       const newResult: GeneratedData = {
         id: new Date().toISOString(),
         ...response,
-        item1: values.item1,
-        item2: values.item2,
+        items: items,
       };
       setResult(newResult);
       setHistory([newResult, ...history].slice(0, 10)); // Keep history to 10 items

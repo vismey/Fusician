@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview Generates a quirky product name based on two input items.
+ * @fileOverview Generates a quirky product name based on a list of input items.
  *
  * - generateProductName - A function that generates a product name.
  * - GenerateProductNameInput - The input type for the generateProductName function.
@@ -12,8 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateProductNameInputSchema = z.object({
-  item1: z.string().describe('The first item to fuse.'),
-  item2: z.string().describe('The second item to fuse.'),
+  items: z.array(z.string()).describe('The list of items to fuse.'),
 });
 export type GenerateProductNameInput = z.infer<typeof GenerateProductNameInputSchema>;
 
@@ -30,7 +29,7 @@ const prompt = ai.definePrompt({
   name: 'generateProductNamePrompt',
   input: {schema: GenerateProductNameInputSchema},
   output: {schema: GenerateProductNameOutputSchema},
-  prompt: `You are a creative product naming expert. Given two items, generate a quirky and funny product name that combines the essence of both items.\n\nItem 1: {{{item1}}}\nItem 2: {{{item2}}}\n\nProduct Name:`,
+  prompt: `You are a creative product naming expert. Given a list of items, generate a quirky and funny product name that combines the essence of all items.\n\nItems:\n{{#each items}}- {{{this}}}\n{{/each}}\n\nProduct Name:`,
 });
 
 const generateProductNameFlow = ai.defineFlow(

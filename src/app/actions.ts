@@ -15,20 +15,21 @@ const FuseResultSchema = z.object({
 
 export type FuseResult = z.infer<typeof FuseResultSchema>;
 
-export async function fuseItems(item1: string, item2: string): Promise<Partial<FuseResult> & { error?: string }> {
+export async function fuseItems(items: string[]): Promise<Partial<FuseResult> & { error?: string }> {
   try {
-    if (!item1 || !item2) {
-      return { error: 'Please provide two items to fuse.' };
+    const nonEmptyItems = items.filter(item => item && item.trim() !== '');
+    if (nonEmptyItems.length < 2) {
+      return { error: 'Please provide at least two items to fuse.' };
     }
 
-    const nameResult = await generateProductName({ item1, item2 });
+    const nameResult = await generateProductName({ items: nonEmptyItems });
     if (!nameResult.productName) {
         return { error: 'Could not generate a product name.' };
     }
     const productName = nameResult.productName;
 
 
-    const featuresResult = await generateProductFeatures({ item1, item2, productName });
+    const featuresResult = await generateProductFeatures({ items: nonEmptyItems, productName });
     if (!featuresResult.features || featuresResult.features.length === 0) {
         return { error: 'Could not generate product features.' };
     }
