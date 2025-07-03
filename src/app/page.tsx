@@ -9,12 +9,12 @@ import { Wand2, ArrowRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const exampleIngredients = [
-  ['A Cat', 'A Toaster'],
-  ['A Dragon', 'A Rubber Ducky'],
-  ['A Black Hole', 'A Donut'],
-  ['A Unicorn', 'A Skateboard'],
-  ['A Pirate Ship', 'A Smartphone'],
-  ['A Wizard Hat', 'A Disco Ball'],
+  ['A Pocket Watch', 'A Nebula'],
+  ['A Bonsai Tree', 'A Thunderstorm'],
+  ['An Old Library', 'A Spaceship'],
+  ['A Hummingbird', 'A Sword'],
+  ['A Secret Agent', 'A Croissant'],
+  ['A Volcano', 'A Music Box'],
 ];
 
 export default function Home() {
