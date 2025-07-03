@@ -29,10 +29,10 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 type GeneratedData = FuseResult & { id: string; items: string[]; };
 
 const formSchema = z.object({
-  item1: z.string().min(2, { message: 'Must be at least 2 characters.' }),
-  item2: z.string().min(2, { message: 'Must be at least 2 characters.' }),
-  item3: z.string().optional(),
-  item4: z.string().optional(),
+  ingredient1: z.string().min(2, { message: 'Must be at least 2 characters.' }),
+  ingredient2: z.string().min(2, { message: 'Must be at least 2 characters.' }),
+  ingredient3: z.string().optional(),
+  ingredient4: z.string().optional(),
 });
 
 function Header() {
@@ -43,7 +43,7 @@ function Header() {
         Fuse It!
       </h1>
       <p className="text-muted-foreground mt-3 text-lg">
-        Generate quirky product ideas from any two ingredients!
+        Generate quirky product ideas from any ingredients!
       </p>
     </header>
   );
@@ -103,7 +103,7 @@ function HistoryView({ history, onSelect, onClear }: { history: GeneratedData[],
 function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof formSchema>) => void, isLoading: boolean }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { item1: '', item2: '', item3: '', item4: '' },
+    defaultValues: { ingredient1: '', ingredient2: '', ingredient3: '', ingredient4: '' },
   });
   
   const [itemCount, setItemCount] = useState(2);
@@ -126,7 +126,7 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
             <div className="grid md:grid-cols-2 gap-6 items-start">
               <FormField
                 control={form.control}
-                name="item1"
+                name="ingredient1"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-lg">Ingredient 1</FormLabel>
@@ -139,7 +139,7 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
               />
               <FormField
                 control={form.control}
-                name="item2"
+                name="ingredient2"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-lg">Ingredient 2</FormLabel>
@@ -153,7 +153,7 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
               {itemCount >= 3 && (
                  <FormField
                   control={form.control}
-                  name="item3"
+                  name="ingredient3"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-lg">Ingredient 3</FormLabel>
@@ -168,7 +168,7 @@ function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof f
                {itemCount >= 4 && (
                  <FormField
                   control={form.control}
-                  name="item4"
+                  name="ingredient4"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-lg">Ingredient 4</FormLabel>
@@ -328,7 +328,7 @@ export default function Home() {
     setIsLoading(true);
     setResult(null);
 
-    const items = [values.item1, values.item2, values.item3, values.item4].filter((v): v is string => !!v && v.trim().length > 0);
+    const items = [values.ingredient1, values.ingredient2, values.ingredient3, values.ingredient4].filter((v): v is string => !!v && v.trim().length > 0);
 
     if (items.length < 2) {
       setIsLoading(false);
