@@ -46,7 +46,7 @@ function Header() {
       <Link href="/" className="inline-block cursor-pointer">
         <h1 className="text-5xl md:text-6xl font-bold text-center flex items-center justify-center gap-3 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
           <Wand2 className="w-12 h-12 text-primary" />
-          Fuse It!
+          Fusician!
         </h1>
       </Link>
       <p className="text-muted-foreground mt-3 text-lg">
@@ -238,7 +238,7 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
 
         await navigator.share({
           title: `Check out my creation: ${result.productName}!`,
-          text: `Generated with Fuse It!`,
+          text: `Generated with Fusician!`,
           files: [file],
         });
       } catch (error) {
@@ -352,7 +352,7 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
 function FusePageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const [result, setResult] = useState<GeneratedData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [history, setHistory] = useLocalStorage<GeneratedData[]>('fuse-it-history', []);
+  const [history, setHistory] = useLocalStorage<GeneratedData[]>('fusician-history', []);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
 

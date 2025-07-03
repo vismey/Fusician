@@ -9,14 +9,14 @@ import { Wand2, ArrowRight, Rocket } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const exampleIngredients = [
-  ['Cat', 'Laptop'],
-  ['Book', 'Coffee'],
-  ['Moon', 'Bicycle'],
-  ['Guitar', 'Plant'],
   ['Dragon', 'Ice Cream'],
   ['Robot', 'Sushi'],
   ['Cloud', 'Keyboard'],
   ['Submarine', 'Pineapple'],
+  ['Cat', 'Laptop'],
+  ['Book', 'Coffee'],
+  ['Moon', 'Bicycle'],
+  ['Guitar', 'Plant'],
 ];
 
 export default function Home() {
@@ -44,7 +44,7 @@ export default function Home() {
       >
         <Wand2 className="w-24 h-24 text-primary mb-4" />
         <h1 className="text-6xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-          Welcome to Fuse It!
+          Welcome to Fusician!
         </h1>
         <p className="mt-4 text-xl md:text-2xl text-muted-foreground max-w-2xl">
           Unleash your imagination and fuse everyday items into extraordinary, hilarious product concepts.
