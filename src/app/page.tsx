@@ -266,18 +266,18 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
                             const featureImage = isNewFormat ? (feature as {image: string}).image : null;
 
                             return (
-                                <li key={i} className="flex flex-col items-start gap-3">
+                                <li key={i} className="flex flex-col items-center gap-4 text-center">
                                     {featureImage && (
                                         <Image
                                             src={featureImage}
                                             alt={featureText}
-                                            width={400}
-                                            height={400}
-                                            className="rounded-lg border-2 border-secondary shadow-md w-full"
+                                            width={256}
+                                            height={256}
+                                            className="rounded-lg border-2 border-secondary shadow-md"
                                             data-ai-hint="product feature"
                                         />
                                     )}
-                                    <div className="flex items-start gap-3 pt-2">
+                                    <div className="flex items-start gap-3 max-w-xs text-center">
                                         <Sparkles className="w-5 h-5 text-primary mt-1 shrink-0" />
                                         <span>{featureText}</span>
                                     </div>
