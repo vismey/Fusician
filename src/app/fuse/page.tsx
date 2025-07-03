@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -108,10 +107,13 @@ function HistoryView({ history, onSelect, onClear }: { history: GeneratedData[],
   );
 }
 
-function FuseForm({ onSubmit, isLoading }: { onSubmit: (values: z.infer<typeof formSchema>) => void, isLoading: boolean }) {
-  const searchParams = useSearchParams();
-  const ingredient1 = searchParams.get('ingredient1') || '';
-  const ingredient2 = searchParams.get('ingredient2') || '';
+function FuseForm({ onSubmit, isLoading, searchParams }: { 
+  onSubmit: (values: z.infer<typeof formSchema>) => void, 
+  isLoading: boolean,
+  searchParams: { [key: string]: string | string[] | undefined } 
+}) {
+  const ingredient1 = typeof searchParams?.ingredient1 === 'string' ? searchParams.ingredient1 : '';
+  const ingredient2 = typeof searchParams?.ingredient2 === 'string' ? searchParams.ingredient2 : '';
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -347,7 +349,7 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
   );
 }
 
-function FusePageContent() {
+function FusePageContent({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const [result, setResult] = useState<GeneratedData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useLocalStorage<GeneratedData[]>('fuse-it-history', []);
@@ -436,7 +438,7 @@ function FusePageContent() {
                   result ? (
                     <ResultView result={result} onBack={handleClearResult} />
                   ) : (
-                    <FuseForm onSubmit={handleFuseSubmit} isLoading={isLoading} />
+                    <FuseForm onSubmit={handleFuseSubmit} isLoading={isLoading} searchParams={searchParams} />
                   )
                 ) : (
                   <Card className="shadow-2xl rounded-2xl flex items-center justify-center h-[500px]">
@@ -487,10 +489,10 @@ function FusePageLoader() {
     )
 }
 
-export default function FusePage() {
+export default function FusePage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
     return (
         <Suspense fallback={<FusePageLoader />}>
-            <FusePageContent />
+            <FusePageContent searchParams={searchParams} />
         </Suspense>
     )
 }
