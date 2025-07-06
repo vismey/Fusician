@@ -41,16 +41,10 @@ export async function fuseItems(items: string[]): Promise<Partial<FuseResult> & 
     }
     const featureStrings = featuresResult.features;
 
-    // Generate images for features in parallel
-    const featureImagePromises = featureStrings.map(featureText =>
-      generateFeatureImage({ productName, feature: featureText })
-    );
-
-    const featureImageResults = await Promise.all(featureImagePromises);
-
-    const features = featureStrings.map((text, index) => ({
+    // Feature images are disabled to prevent timeouts on Vercel.
+    const features = featureStrings.map((text) => ({
         text,
-        image: featureImageResults[index].imageDataUri
+        image: ''
     }));
 
     const slogansResult = await generateMarketingSlogans({ productName, productFeatures: featureStrings });
