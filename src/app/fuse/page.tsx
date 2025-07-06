@@ -25,7 +25,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { fuseItems, FuseResult } from '@/app/actions';
-import { ThemeToggle } from '@/components/theme-toggle';
 
 import { Sparkles, Lightbulb, Download, Share2, Loader2, Wand2, History as HistoryIcon, ArrowLeft, PlusCircle } from 'lucide-react';
 
@@ -46,11 +45,6 @@ function Header() {
               <Wand2 className="h-7 w-7 text-primary" />
               <span className="text-2xl font-bold">Fusician!</span>
           </Link>
-          <div className="flex flex-1 items-center justify-end space-x-4">
-              <nav className="flex items-center space-x-1">
-                  <ThemeToggle />
-              </nav>
-          </div>
         </div>
       </header>
     );
