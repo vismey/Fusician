@@ -312,8 +312,10 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
                         <CarouselContent>
                             {result.slogans.map((slogan, i) => (
                                 <CarouselItem key={i}>
-                                    <div className="p-1">
-                                        <p className="text-center font-semibold text-lg italic text-muted-foreground">"{slogan}"</p>
+                                    <div className="p-4 h-full flex items-center justify-center">
+                                      <blockquote className="text-center">
+                                          <p className="text-lg font-semibold italic text-foreground/80">"{slogan}"</p>
+                                      </blockquote>
                                     </div>
                                 </CarouselItem>
                             ))}
