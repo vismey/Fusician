@@ -13,7 +13,7 @@ import {z} from 'genkit';
 
 const GenerateProductPosterInputSchema = z.object({
   productName: z.string().describe('The name of the fused product.'),
-  slogan: z.string().describe('The marketing slogan for the fused product.'),
+  slogan: z.string().optional().describe('An optional marketing slogan for the fused product.'),
 });
 export type GenerateProductPosterInput = z.infer<typeof GenerateProductPosterInputSchema>;
 
@@ -30,28 +30,6 @@ export async function generateProductPoster(input: GenerateProductPosterInput): 
   return generateProductPosterFlow(input);
 }
 
-const generateProductPosterPrompt = ai.definePrompt({
-  name: 'generateProductPosterPrompt',
-  input: {schema: GenerateProductPosterInputSchema},
-  output: {schema: GenerateProductPosterOutputSchema},
-  prompt: `You are an expert marketing designer specializing in creating posters for quirky products.
-
-You will generate a poster for the product with the name "{{productName}}" and slogan "{{slogan}}".
-
-The poster should include:
-- The product name
-- A visual doodle or image of the fused product
-- The slogan in large text
-- A brand color border (Candy Pop theme: #FF6B9D, #4ECDC4, #FFE66D, #A8E6CF, #FFFFFF)
-
-{{#if imageName}}
-  {{media url=imageName}}
-{{/if}}
-
-Return the poster as a data URI.
-`,
-});
-
 const generateProductPosterFlow = ai.defineFlow(
   {
     name: 'generateProductPosterFlow',
@@ -59,12 +37,14 @@ const generateProductPosterFlow = ai.defineFlow(
     outputSchema: GenerateProductPosterOutputSchema,
   },
   async input => {
+    // Construct the prompt, including the slogan only if it's provided.
+    const prompt = `Generate a fun, eye-catching product poster in a playful 'Candy Pop' UI style for a product called "${input.productName}"${input.slogan ? ` with the slogan: "${input.slogan}"` : ''}.`;
+    
     // Generate the image
     const {media} = await ai.generate({
       // IMPORTANT: ONLY the googleai/gemini-2.0-flash-preview-image-generation model is able to generate images. You MUST use exactly this model to generate images.
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
-
-      prompt: `Generate an image of ${input.productName} with slogan: ${input.slogan}`,
+      prompt: prompt,
       config: {
         responseModalities: ['TEXT', 'IMAGE'], // MUST provide both TEXT and IMAGE, IMAGE only won't work
       },

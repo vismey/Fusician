@@ -27,37 +27,31 @@ export async function fuseItems(items: string[]): Promise<Partial<FuseResult> & 
       return { error: 'Please provide at least two ingredients to fuse.' };
     }
 
+    // Step 1: Generate name, which is needed by all subsequent steps.
     const nameResult = await generateProductName({ items: nonEmptyItems });
     if (!nameResult.productName) {
         return { error: 'Could not generate a product name.' };
     }
     const productName = nameResult.productName;
 
-    // Run features and slogans generation in parallel to speed things up
-    const [featuresResult, slogansResult] = await Promise.all([
+    // Step 2: Run features, slogans, and poster generation in parallel for maximum speed.
+    const [featuresResult, slogansResult, posterResult] = await Promise.all([
       generateProductFeatures({ items: nonEmptyItems, productName }),
       generateMarketingSlogans({ productName }),
+      generateProductPoster({ productName }), // Slogan is omitted here to allow for parallel execution
     ]);
 
-
+    // Process results
     if (!featuresResult.features || featuresResult.features.length === 0) {
         return { error: 'Could not generate product features.' };
     }
-    const featureStrings = featuresResult.features;
-
-    // Feature images are disabled to prevent timeouts on Vercel.
-    const features = featureStrings.map((text) => ({
-        text,
-        image: ''
-    }));
+    const features = featuresResult.features.map((text) => ({ text, image: '' }));
 
     if (!slogansResult.slogans || slogansResult.slogans.length === 0) {
         return { error: 'Could not generate marketing slogans.' };
     }
     const slogans = slogansResult.slogans;
     
-    // Use the first slogan for the poster, this runs after slogans are generated.
-    const posterResult = await generateProductPoster({ productName, slogan: slogans[0] });
     if (!posterResult.posterDataUri) {
         return { error: 'Could not generate a product poster.' };
     }
