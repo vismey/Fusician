@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Wand2, ArrowRight, Combine, Sparkles, Share2, Rocket } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const InspiringFusions = [
   { item1: 'Dragon', item2: 'Ice Cream', description: 'Fire and ice in a cone. What could go wrong?' },
@@ -26,6 +27,7 @@ export default function Home() {
             <Wand2 className="h-7 w-7 text-primary" />
             <span className="text-2xl font-bold">Fusician!</span>
           </Link>
+          <ThemeToggle />
         </div>
       </header>
 

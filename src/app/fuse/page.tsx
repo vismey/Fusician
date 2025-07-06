@@ -27,6 +27,7 @@ import useLocalStorage from '@/hooks/use-local-storage';
 import { fuseItems, FuseResult } from '@/app/actions';
 
 import { Sparkles, Lightbulb, Download, Share2, Loader2, Wand2, History as HistoryIcon, ArrowLeft, PlusCircle } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type GeneratedData = FuseResult & { id: string; items: string[]; };
 
@@ -40,11 +41,12 @@ const formSchema = z.object({
 function Header() {
     return (
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
-        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+        <div className="container flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
               <Wand2 className="h-7 w-7 text-primary" />
               <span className="text-2xl font-bold">Fusician!</span>
           </Link>
+          <ThemeToggle />
         </div>
       </header>
     );
@@ -294,7 +296,7 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
                            <ul className="space-y-4">
                             {result.slogans.map((slogan, i) => (
                                 <li key={i}>
-                                  <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground">
+                                  <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground py-2">
                                       "{slogan}"
                                   </blockquote>
                                 </li>
