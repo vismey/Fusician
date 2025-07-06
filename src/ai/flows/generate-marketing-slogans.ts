@@ -2,7 +2,7 @@
 /**
  * @fileOverview This file defines a Genkit flow for generating funny marketing slogans for a product.
  *
- * - generateMarketingSlogans - A function that generates marketing slogans for a given product name and features.
+ * - generateMarketingSlogans - A function that generates marketing slogans for a given product name.
  * - GenerateMarketingSlogansInput - The input type for the generateMarketingSlogans function.
  * - GenerateMarketingSlogansOutput - The output type for the generateMarketingSlogans function.
  */
@@ -12,7 +12,6 @@ import {z} from 'genkit';
 
 const GenerateMarketingSlogansInputSchema = z.object({
   productName: z.string().describe('The name of the product.'),
-  productFeatures: z.array(z.string()).describe('A list of features for the product.'),
 });
 export type GenerateMarketingSlogansInput = z.infer<
   typeof GenerateMarketingSlogansInputSchema
@@ -40,10 +39,6 @@ const prompt = ai.definePrompt({
   Generate a list of funny marketing slogans for the following product:
 
   Product Name: {{productName}}
-  Product Features:
-  {{#each productFeatures}}
-  - {{this}}
-  {{/each}}
   `,
 });
 

@@ -4,7 +4,6 @@ import { generateProductName } from '@/ai/flows/generate-product-name';
 import { generateProductFeatures } from '@/ai/flows/generate-product-features';
 import { generateMarketingSlogans } from '@/ai/flows/generate-marketing-slogans';
 import { generateProductPoster } from '@/ai/flows/generate-product-poster';
-import { generateFeatureImage } from '@/ai/flows/generate-feature-image';
 import { z } from 'zod';
 
 const FeatureSchema = z.object({
@@ -34,8 +33,13 @@ export async function fuseItems(items: string[]): Promise<Partial<FuseResult> & 
     }
     const productName = nameResult.productName;
 
+    // Run features and slogans generation in parallel to speed things up
+    const [featuresResult, slogansResult] = await Promise.all([
+      generateProductFeatures({ items: nonEmptyItems, productName }),
+      generateMarketingSlogans({ productName }),
+    ]);
 
-    const featuresResult = await generateProductFeatures({ items: nonEmptyItems, productName });
+
     if (!featuresResult.features || featuresResult.features.length === 0) {
         return { error: 'Could not generate product features.' };
     }
@@ -47,13 +51,12 @@ export async function fuseItems(items: string[]): Promise<Partial<FuseResult> & 
         image: ''
     }));
 
-    const slogansResult = await generateMarketingSlogans({ productName, productFeatures: featureStrings });
     if (!slogansResult.slogans || slogansResult.slogans.length === 0) {
         return { error: 'Could not generate marketing slogans.' };
     }
     const slogans = slogansResult.slogans;
     
-    // Use the first slogan for the poster
+    // Use the first slogan for the poster, this runs after slogans are generated.
     const posterResult = await generateProductPoster({ productName, slogan: slogans[0] });
     if (!posterResult.posterDataUri) {
         return { error: 'Could not generate a product poster.' };
