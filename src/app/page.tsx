@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Wand2, ArrowRight, Mix, Sparkles, Share2, Rocket } from 'lucide-react';
+import { Wand2, ArrowRight, Combine, Sparkles, Share2, Rocket } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const InspiringFusions = [
@@ -131,7 +131,7 @@ export default function Home() {
                   viewport={{ once: true, amount: 0.5 }}
                   className="grid gap-2"
                 >
-                  <div className="flex justify-center"><Mix className="h-12 w-12 text-primary" /></div>
+                  <div className="flex justify-center"><Combine className="h-12 w-12 text-primary" /></div>
                   <h3 className="text-lg font-bold">1. Pick Ingredients</h3>
                   <p className="text-sm text-muted-foreground">Choose two or more items you want to fuse. The weirder, the better!</p>
               </motion.div>
