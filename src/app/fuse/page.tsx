@@ -439,11 +439,11 @@ function FusePageContent() {
     <div className="bg-background min-h-screen">
       <div className="container mx-auto px-4 py-2">
         <Header />
-        <main className="grid lg:grid-cols-3 gap-8 mt-6">
+        <main className="grid lg:grid-cols-4 gap-8 mt-6">
           <aside className="lg:col-span-1 hidden lg:block">
             {isClient && <HistoryView history={history} onSelect={handleSelectHistory} onClear={handleClearHistory} />}
           </aside>
-          <section className="lg:col-span-2">
+          <section className="lg:col-span-3">
             <AnimatePresence mode="wait">
               <motion.div
                 key={result ? 'result' : 'form'}
