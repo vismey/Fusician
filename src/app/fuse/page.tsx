@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -19,7 +20,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import useLocalStorage from '@/hooks/use-local-storage';
@@ -27,7 +28,6 @@ import { fuseItems, FuseResult } from '@/app/actions';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 import { Sparkles, Lightbulb, Download, Share2, Loader2, Wand2, History as HistoryIcon, ArrowLeft, PlusCircle } from 'lucide-react';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 type GeneratedData = FuseResult & { id: string; items: string[]; };
 
@@ -39,68 +39,63 @@ const formSchema = z.object({
 });
 
 function Header() {
-  return (
-    <header className="py-6 text-center relative">
-       <div className="absolute top-6 right-0">
-        <ThemeToggle />
-      </div>
-      <Link href="/" className="inline-block cursor-pointer">
-        <h1 className="text-5xl md:text-6xl font-bold text-center flex items-center justify-center gap-3 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-          <Wand2 className="w-12 h-12 text-primary" />
-          Fusician!
-        </h1>
-      </Link>
-      <p className="text-muted-foreground mt-3 text-lg">
-        Generate quirky product ideas from any ingredients!
-      </p>
-    </header>
-  );
+    return (
+      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
+        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+          <Link href="/" className="flex items-center gap-2">
+              <Wand2 className="h-7 w-7 text-primary" />
+              <span className="text-2xl font-bold">Fusician!</span>
+          </Link>
+          <div className="flex flex-1 items-center justify-end space-x-4">
+              <nav className="flex items-center space-x-1">
+                  <ThemeToggle />
+              </nav>
+          </div>
+        </div>
+      </header>
+    );
 }
 
 function HistoryView({ history, onSelect, onClear }: { history: GeneratedData[], onSelect: (item: GeneratedData) => void, onClear: () => void }) {
-  return (
-    <Card className="shadow-lg h-full">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle className="flex items-center gap-2">
-            <HistoryIcon className="w-6 h-6" />
-            History
-          </CardTitle>
-          {history.length > 0 && (
-             <Button variant="ghost" size="sm" onClick={onClear}>Clear</Button>
-          )}
-        </div>
-        <CardDescription>Your past creations.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[600px] pr-4">
-          {history.length === 0 ? (
-            <div className="text-center text-muted-foreground py-16">
-              <p>Your fused products will appear here.</p>
+    return (
+      <div className="sticky top-24">
+        <Card className="shadow-md h-full">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <HistoryIcon className="w-5 h-5" />
+                History
+              </CardTitle>
+              {history.length > 0 && (
+                 <Button variant="ghost" size="sm" onClick={onClear}>Clear</Button>
+              )}
             </div>
-          ) : (
-            <div className="space-y-4">
-              {history.map((item) => (
-                <div key={item.id} className="cursor-pointer group" onClick={() => onSelect(item)}>
-                  <Card className="hover:border-primary transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
-                    <CardContent className="p-3 flex items-center gap-4">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-md bg-muted shrink-0">
-                          <Wand2 className="h-8 w-8 text-muted-foreground" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-sm group-hover:text-primary">{item.productName}</p>
-                        <p className="text-xs text-muted-foreground">{Array.isArray(item.items) ? item.items.join(' + ') : ''}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[calc(100vh-200px)] pr-3 -mr-3">
+              {history.length === 0 ? (
+                <div className="text-center text-muted-foreground py-16">
+                  <p>Your fused products will appear here.</p>
                 </div>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
-      </CardContent>
-    </Card>
-  );
+              ) : (
+                <div className="space-y-3">
+                  {history.map((item) => (
+                    <div key={item.id} className="cursor-pointer group" onClick={() => onSelect(item)}>
+                      <Card className="hover:border-primary transition-colors duration-200 hover:bg-muted/50">
+                        <CardContent className="p-3">
+                          <p className="font-semibold text-sm group-hover:text-primary truncate">{item.productName}</p>
+                          <p className="text-xs text-muted-foreground truncate">{Array.isArray(item.items) ? item.items.join(' + ') : ''}</p>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+    );
 }
 
 function FuseForm({ onSubmit, isLoading }: { 
@@ -122,102 +117,95 @@ function FuseForm({ onSubmit, isLoading }: {
   });
   
   const [itemCount, setItemCount] = useState(2);
-  const [isButtonAnimating, setIsButtonAnimating] = useState(false);
-
-  const handleAnimate = () => {
-    setIsButtonAnimating(true);
-    setTimeout(() => setIsButtonAnimating(false), 700);
-  }
 
   return (
-    <Card className="shadow-2xl rounded-2xl">
-      <CardHeader>
-        <CardTitle>Create a new fusion</CardTitle>
-        <CardDescription>What ingredients should we fuse today?</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Card className="shadow-lg border-2 border-transparent focus-within:border-primary transition-all duration-300">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="grid md:grid-cols-2 gap-6 items-start">
-              <FormField
-                control={form.control}
-                name="ingredient1"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-lg">Ingredient 1</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Apple" {...field} className="py-6 text-lg rounded-xl" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="ingredient2"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-lg">Ingredient 2</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Car" {...field} className="py-6 text-lg rounded-xl" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {itemCount >= 3 && (
-                 <FormField
-                  control={form.control}
-                  name="ingredient3"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg">Ingredient 3</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Sunglasses" {...field} className="py-6 text-lg rounded-xl" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-               {itemCount >= 4 && (
-                 <FormField
-                  control={form.control}
-                  name="ingredient4"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg">Ingredient 4</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Book" {...field} className="py-6 text-lg rounded-xl" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-            </div>
-             {itemCount < 4 && (
-              <div className="flex justify-center">
-                <Button type="button" variant="outline" onClick={() => setItemCount(prev => prev + 1)}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add another ingredient
-                </Button>
-              </div>
-            )}
-            <div className="relative flex justify-center pt-4">
-              <Button type="submit" size="lg" disabled={isLoading} className="rounded-full px-12 py-8 text-2xl font-bold shadow-lg transform transition-transform duration-200 hover:scale-105 active:scale-95" onClick={handleAnimate}>
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-8 w-8 animate-spin" />
-                ) : (
-                  <Wand2 className="mr-3 h-8 w-8" />
-                )}
-                Fuse!
-              </Button>
-               {isButtonAnimating && <Sparkles className="absolute w-10 h-10 text-accent animate-ping" />}
-            </div>
-          </form>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+                <CardHeader>
+                    <CardTitle className="text-2xl">Create a New Fusion</CardTitle>
+                    <CardDescription>Combine up to four items to invent something new.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="ingredient1"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Ingredient 1</FormLabel>
+                            <FormControl>
+                            <Input placeholder="e.g., Apple" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="ingredient2"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Ingredient 2</FormLabel>
+                            <FormControl>
+                            <Input placeholder="e.g., Car" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    {itemCount >= 3 && (
+                        <FormField
+                        control={form.control}
+                        name="ingredient3"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Ingredient 3</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g., Sunglasses" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                    )}
+                    {itemCount >= 4 && (
+                        <FormField
+                        control={form.control}
+                        name="ingredient4"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Ingredient 4</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g., Book" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                    )}
+                    </div>
+                    {itemCount < 4 && (
+                    <div className="flex justify-start">
+                        <Button type="button" variant="ghost" className="text-muted-foreground" onClick={() => setItemCount(prev => prev + 1)}>
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add another ingredient
+                        </Button>
+                    </div>
+                    )}
+                </CardContent>
+                <CardFooter className="flex justify-end">
+                    <Button type="submit" size="lg" disabled={isLoading} className="font-bold shadow-lg">
+                        {isLoading ? (
+                        <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                        ) : (
+                        <Wand2 className="mr-2 h-6 w-6" />
+                        )}
+                        Fuse Ingredients
+                    </Button>
+                </CardFooter>
+            </form>
         </Form>
-      </CardContent>
     </Card>
   );
 }
@@ -254,105 +242,102 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
   };
   
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
-        <Button variant="ghost" onClick={onBack} className="mb-4">
+    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
+        <Button variant="outline" onClick={onBack} className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Fusion
+            Create another fusion
         </Button>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="lg:col-span-2">
-                <Card className="shadow-2xl rounded-2xl w-full text-center">
-                    <CardHeader>
-                        <CardTitle className="text-4xl font-bold">{result.productName}</CardTitle>
-                        <CardDescription>A fusion of {Array.isArray(result.items) ? result.items.map(item => `'${item}'`).join(' and ') : ''}</CardDescription>
-                    </CardHeader>
-                </Card>
+        <div className="space-y-8">
+            <Card className="shadow-xl rounded-2xl w-full text-center p-8 bg-muted/20">
+                <p className="text-sm font-medium text-primary uppercase tracking-wider">Your Fusion</p>
+                <h2 className="text-5xl font-bold mt-2">{result.productName}</h2>
+                <p className="text-muted-foreground mt-3 text-lg">
+                    A fusion of {Array.isArray(result.items) ? result.items.map(item => `'${item}'`).join(', ') : ''}
+                </p>
+            </Card>
+
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <div className="lg:col-span-3">
+                    <Card className="shadow-lg rounded-2xl h-full">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Lightbulb /> Key Features</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="space-y-6">
+                                {result.features.map((feature, i) => {
+                                    const isNewFormat = typeof feature === 'object' && feature !== null && 'text' in feature;
+                                    const featureText = isNewFormat ? (feature as {text: string}).text : feature as string;
+                                    const featureImage = isNewFormat ? (feature as {image: string}).image : null;
+
+                                    return (
+                                        <li key={i} className="flex items-start gap-4">
+                                            {featureImage ? (
+                                                <Image
+                                                    src={featureImage}
+                                                    alt={featureText}
+                                                    width={80}
+                                                    height={80}
+                                                    className="rounded-lg border-2 border-secondary shadow-md shrink-0"
+                                                    data-ai-hint="product feature"
+                                                />
+                                            ): <div className="w-20 h-20 bg-muted rounded-lg shrink-0 flex items-center justify-center"><Lightbulb className="w-8 h-8 text-muted-foreground"/></div>}
+                                            <div>
+                                                <p className="font-semibold">{featureText}</p>
+                                            </div>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className="lg:col-span-2">
+                    <Card className="shadow-lg rounded-2xl h-full">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Sparkles /> Marketing Slogans</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                           <ul className="space-y-4">
+                            {result.slogans.map((slogan, i) => (
+                                <li key={i}>
+                                  <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground">
+                                      "{slogan}"
+                                  </blockquote>
+                                </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
             
-            <Card className="shadow-xl rounded-2xl">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Lightbulb /> Features</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <ul className="space-y-6">
-                        {result.features.map((feature, i) => {
-                            const isNewFormat = typeof feature === 'object' && feature !== null && 'text' in feature;
-                            const featureText = isNewFormat ? (feature as {text: string}).text : feature as string;
-                            const featureImage = isNewFormat ? (feature as {image: string}).image : null;
-
-                            return (
-                                <li key={i} className="flex flex-col items-center gap-4 text-center">
-                                    {featureImage && (
-                                        <Image
-                                            src={featureImage}
-                                            alt={featureText}
-                                            width={128}
-                                            height={128}
-                                            className="rounded-lg border-2 border-secondary shadow-md"
-                                            data-ai-hint="product feature"
-                                        />
-                                    )}
-                                    <div className="flex items-start justify-center gap-3 max-w-xs text-center">
-                                        <Sparkles className="w-5 h-5 text-primary mt-1 shrink-0" />
-                                        <span>{featureText}</span>
-                                    </div>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </CardContent>
-            </Card>
-
-            <Card className="shadow-xl rounded-2xl">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Sparkles /> Marketing Slogans</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Carousel className="w-full max-w-xs mx-auto">
-                        <CarouselContent>
-                            {result.slogans.map((slogan, i) => (
-                                <CarouselItem key={i}>
-                                    <div className="p-4 h-full flex items-center justify-center">
-                                      <blockquote className="text-center">
-                                          <p className="text-lg font-semibold italic text-foreground/80">"{slogan}"</p>
-                                      </blockquote>
-                                    </div>
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
-                        <CarouselPrevious />
-                        <CarouselNext />
-                    </Carousel>
-                </CardContent>
-            </Card>
-
-            <div className="lg:col-span-2">
-                {result.posterDataUri ? (
-                    <Card className="shadow-2xl rounded-2xl">
-                        <CardHeader>
-                            <CardTitle>Poster</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex flex-col items-center gap-6">
-                            <Image src={result.posterDataUri} alt={`${result.productName} poster`} width={512} height={512} className="rounded-lg border-4 border-accent shadow-lg" data-ai-hint="product poster" />
-                            <div className="flex gap-4">
-                                <a href={result.posterDataUri} download={`${result.productName}-poster.png`}>
-                                    <Button size="lg"><Download className="mr-2 h-5 w-5" /> Save</Button>
-                                </a>
-                                <Button size="lg" variant="outline" onClick={handleShare}><Share2 className="mr-2 h-5 w-5" /> Share</Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <Card className="shadow-xl rounded-2xl">
-                        <CardHeader>
-                            <CardTitle>Poster</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex flex-col items-center justify-center gap-4 text-center h-64">
-                             <p className="text-muted-foreground">Poster image not available for history items to save space.</p>
-                        </CardContent>
-                    </Card>
-                )}
-            </div>
+            {result.posterDataUri ? (
+                <Card className="shadow-xl rounded-2xl">
+                    <CardHeader>
+                        <CardTitle>Your Product Poster</CardTitle>
+                        <CardDescription>Ready to be shared with the world!</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col items-center gap-6">
+                        <Image src={result.posterDataUri} alt={`${result.productName} poster`} width={512} height={512} className="rounded-lg border-4 border-accent shadow-lg" data-ai-hint="product poster" />
+                        <div className="flex gap-4">
+                            <a href={result.posterDataUri} download={`${result.productName}-poster.png`}>
+                                <Button size="lg"><Download className="mr-2 h-5 w-5" /> Download Poster</Button>
+                            </a>
+                            <Button size="lg" variant="outline" onClick={handleShare}><Share2 className="mr-2 h-5 w-5" /> Share</Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            ) : (
+                !result.id.includes('MANUAL') && // Don't show this card for old history items
+                <Card className="shadow-xl rounded-2xl">
+                    <CardHeader>
+                        <CardTitle>Poster</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex flex-col items-center justify-center gap-4 text-center h-64">
+                          <p className="text-muted-foreground">Poster generation is not available for this item.</p>
+                    </CardContent>
+                </Card>
+            )}
         </div>
     </motion.div>
   );
@@ -407,7 +392,6 @@ function FusePageContent() {
       };
       setResult(newResult);
 
-      // Create a lightweight version for history to avoid storage quota errors
       const historyEntry: GeneratedData = {
         ...newResult,
         posterDataUri: '',
@@ -417,12 +401,24 @@ function FusePageContent() {
                 : feature
         ),
       };
-      setHistory([historyEntry, ...history].slice(0, 5)); // Keep history to 5 items
+      setHistory([historyEntry, ...history].slice(0, 10));
     }
   };
 
   const handleSelectHistory = (item: GeneratedData) => {
-    setResult(item);
+    // Re-constitute a result object from history
+    const fullResult: GeneratedData = {
+        ...item,
+        // Since we don't store images in history, we can't show them here.
+        // We also mark poster as empty.
+        posterDataUri: '',
+        features: item.features.map(feature => 
+            (typeof feature === 'object' && feature !== null) 
+                ? { text: feature.text, image: '' } // no image from history
+                : { text: feature, image: ''}
+        )
+    };
+    setResult(fullResult);
   };
   
   const handleClearHistory = () => {
@@ -439,13 +435,10 @@ function FusePageContent() {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-4 py-2">
-        <Header />
-        <main className="grid lg:grid-cols-4 gap-8 mt-6">
-          <aside className="lg:col-span-1 hidden lg:block">
-            {isClient && <HistoryView history={history} onSelect={handleSelectHistory} onClear={handleClearHistory} />}
-          </aside>
-          <section className="lg:col-span-3">
+      <Header />
+      <div className="container mx-auto px-4 py-8">
+        <main className="grid lg:grid-cols-12 gap-8">
+            <section className="lg:col-span-8 xl:col-span-9">
             <AnimatePresence mode="wait">
               <motion.div
                 key={result ? 'result' : 'form'}
@@ -458,7 +451,13 @@ function FusePageContent() {
                   result ? (
                     <ResultView result={result} onBack={handleClearResult} />
                   ) : (
-                    <FuseForm onSubmit={handleFuseSubmit} isLoading={isLoading} />
+                    <>
+                      <div className="mb-6">
+                        <h1 className="text-4xl font-bold tracking-tight">Let's Get Fusing!</h1>
+                        <p className="text-muted-foreground mt-1">What wacky combination will you create today?</p>
+                      </div>
+                      <FuseForm onSubmit={handleFuseSubmit} isLoading={isLoading} />
+                    </>
                   )
                 ) : (
                   <Card className="shadow-2xl rounded-2xl flex items-center justify-center h-[500px]">
@@ -468,6 +467,9 @@ function FusePageContent() {
               </motion.div>
             </AnimatePresence>
           </section>
+          <aside className="lg:col-span-4 xl:col-span-3 hidden lg:block">
+            {isClient && <HistoryView history={history} onSelect={handleSelectHistory} onClear={handleClearHistory} />}
+          </aside>
         </main>
       </div>
     </div>
