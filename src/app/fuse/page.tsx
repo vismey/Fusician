@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -472,45 +472,6 @@ function FusePageContent() {
   );
 }
 
-function FusePageLoader() {
-    return (
-         <div className="bg-background min-h-screen">
-            <div className="container mx-auto px-4 py-2">
-                <Header />
-                <main className="grid lg:grid-cols-3 gap-8 mt-6">
-                    <aside className="lg:col-span-1 hidden lg:block">
-                         <Card className="shadow-lg h-full">
-                            <CardHeader>
-                                <div className="flex justify-between items-center">
-                                <CardTitle className="flex items-center gap-2">
-                                    <HistoryIcon className="w-6 h-6" />
-                                    History
-                                </CardTitle>
-                                </div>
-                                <CardDescription>Your past creations.</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-center text-muted-foreground py-16">
-                                    <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </aside>
-                     <section className="lg:col-span-2">
-                        <Card className="shadow-2xl rounded-2xl flex items-center justify-center h-[500px]">
-                            <Loader2 className="h-16 w-16 animate-spin text-primary" />
-                        </Card>
-                     </section>
-                </main>
-            </div>
-        </div>
-    )
-}
-
 export default function FusePage() {
-    return (
-        <Suspense fallback={<FusePageLoader />}>
-            <FusePageContent />
-        </Suspense>
-    )
+    return <FusePageContent />;
 }
