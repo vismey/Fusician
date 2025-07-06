@@ -83,14 +83,9 @@ function HistoryView({ history, onSelect, onClear }: { history: GeneratedData[],
                 <div key={item.id} className="cursor-pointer group" onClick={() => onSelect(item)}>
                   <Card className="hover:border-primary transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
                     <CardContent className="p-3 flex items-center gap-4">
-                      <Image
-                        src={item.posterDataUri}
-                        alt={`${item.productName} poster`}
-                        width={64}
-                        height={64}
-                        className="rounded-md bg-muted"
-                        data-ai-hint="product poster"
-                      />
+                      <div className="flex h-16 w-16 items-center justify-center rounded-md bg-muted shrink-0">
+                          <Wand2 className="h-8 w-8 text-muted-foreground" />
+                      </div>
                       <div className="flex-1">
                         <p className="font-semibold text-sm group-hover:text-primary">{item.productName}</p>
                         <p className="text-xs text-muted-foreground">{Array.isArray(item.items) ? item.items.join(' + ') : ''}</p>
@@ -329,20 +324,31 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
             </Card>
 
             <div className="lg:col-span-2">
-                 <Card className="shadow-2xl rounded-2xl">
-                    <CardHeader>
-                        <CardTitle>Poster</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center gap-6">
-                         <Image src={result.posterDataUri} alt={`${result.productName} poster`} width={512} height={512} className="rounded-lg border-4 border-accent shadow-lg" data-ai-hint="product poster" />
-                         <div className="flex gap-4">
-                             <a href={result.posterDataUri} download={`${result.productName}-poster.png`}>
-                                 <Button size="lg"><Download className="mr-2 h-5 w-5" /> Save</Button>
-                            </a>
-                            <Button size="lg" variant="outline" onClick={handleShare}><Share2 className="mr-2 h-5 w-5" /> Share</Button>
-                         </div>
-                    </CardContent>
-                 </Card>
+                {result.posterDataUri ? (
+                    <Card className="shadow-2xl rounded-2xl">
+                        <CardHeader>
+                            <CardTitle>Poster</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex flex-col items-center gap-6">
+                            <Image src={result.posterDataUri} alt={`${result.productName} poster`} width={512} height={512} className="rounded-lg border-4 border-accent shadow-lg" data-ai-hint="product poster" />
+                            <div className="flex gap-4">
+                                <a href={result.posterDataUri} download={`${result.productName}-poster.png`}>
+                                    <Button size="lg"><Download className="mr-2 h-5 w-5" /> Save</Button>
+                                </a>
+                                <Button size="lg" variant="outline" onClick={handleShare}><Share2 className="mr-2 h-5 w-5" /> Share</Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <Card className="shadow-xl rounded-2xl">
+                        <CardHeader>
+                            <CardTitle>Poster</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex flex-col items-center justify-center gap-4 text-center h-64">
+                             <p className="text-muted-foreground">Poster image not available for history items to save space.</p>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </div>
     </motion.div>
@@ -397,7 +403,18 @@ function FusePageContent({ searchParams }: { searchParams: { [key: string]: stri
         posterDataUri: response.posterDataUri || '',
       };
       setResult(newResult);
-      setHistory([newResult, ...history].slice(0, 10)); // Keep history to 10 items
+
+      // Create a lightweight version for history to avoid storage quota errors
+      const historyEntry: GeneratedData = {
+        ...newResult,
+        posterDataUri: '',
+        features: newResult.features.map(feature => 
+            (typeof feature === 'object' && feature !== null) 
+                ? { text: feature.text, image: '' } 
+                : feature
+        ),
+      };
+      setHistory([historyEntry, ...history].slice(0, 5)); // Keep history to 5 items
     }
   };
 
