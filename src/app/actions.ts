@@ -15,12 +15,12 @@ const FuseResultSchema = z.object({
   productName: z.string(),
   features: z.array(z.union([FeatureSchema, z.string()])),
   slogans: z.array(z.string()),
-  posterDataUri: z.string(),
+  posterDataUri: z.string().optional(),
 });
 
 export type FuseResult = z.infer<typeof FuseResultSchema>;
 
-export async function fuseItems(items: string[]): Promise<Partial<FuseResult> & { error?: string }> {
+export async function fuseItems(items: string[]): Promise<Partial<Omit<FuseResult, 'posterDataUri'>> & { error?: string }> {
   try {
     const nonEmptyItems = items.filter(item => item && item.trim() !== '');
     if (nonEmptyItems.length < 2) {
@@ -34,11 +34,10 @@ export async function fuseItems(items: string[]): Promise<Partial<FuseResult> & 
     }
     const productName = nameResult.productName;
 
-    // Step 2: Run features, slogans, and poster generation in parallel for maximum speed.
-    const [featuresResult, slogansResult, posterResult] = await Promise.all([
+    // Step 2: Run features and slogans generation in parallel. This is fast.
+    const [featuresResult, slogansResult] = await Promise.all([
       generateProductFeatures({ items: nonEmptyItems, productName }),
       generateMarketingSlogans({ productName }),
-      generateProductPoster({ productName }), // Slogan is omitted here to allow for parallel execution
     ]);
 
     // Process results
@@ -52,16 +51,10 @@ export async function fuseItems(items: string[]): Promise<Partial<FuseResult> & 
     }
     const slogans = slogansResult.slogans;
     
-    if (!posterResult.posterDataUri) {
-        return { error: 'Could not generate a product poster.' };
-    }
-    const posterDataUri = posterResult.posterDataUri;
-
-    const validation = FuseResultSchema.safeParse({
+    const validation = FuseResultSchema.pick({ productName: true, features: true, slogans: true }).safeParse({
         productName,
         features,
         slogans,
-        posterDataUri,
     });
     
     if (!validation.success) {
@@ -75,4 +68,23 @@ export async function fuseItems(items: string[]): Promise<Partial<FuseResult> & 
     console.error("Error in fuseItems action:", error);
     return { error: 'An unexpected error occurred while generating the product. Please try again later.' };
   }
+}
+
+// This new action is called from the client-side to generate the poster asynchronously.
+export async function generatePosterForProduct(productName: string, slogan: string): Promise<{ posterDataUri?: string; error?: string }> {
+    try {
+        if (!productName) {
+            return { error: 'Product name is required to generate a poster.' };
+        }
+        const posterResult = await generateProductPoster({ productName, slogan });
+
+        if (!posterResult.posterDataUri) {
+            return { error: 'Could not generate a product poster.' };
+        }
+        return { posterDataUri: posterResult.posterDataUri };
+
+    } catch(error) {
+        console.error("Error in generatePosterForProduct action:", error);
+        return { error: 'An unexpected error occurred while generating the poster.' };
+    }
 }

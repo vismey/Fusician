@@ -24,9 +24,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import useLocalStorage from '@/hooks/use-local-storage';
-import { fuseItems, FuseResult } from '@/app/actions';
+import { fuseItems, generatePosterForProduct, FuseResult } from '@/app/actions';
 
-import { Sparkles, Lightbulb, Download, Share2, Loader2, Wand2, History as HistoryIcon, ArrowLeft, PlusCircle } from 'lucide-react';
+import { Sparkles, Lightbulb, Download, Share2, Loader2, Wand2, History as HistoryIcon, ArrowLeft, PlusCircle, Image as ImageIcon } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 type GeneratedData = FuseResult & { id: string; items: string[]; };
@@ -208,11 +208,43 @@ function FuseForm({ onSubmit, isLoading }: {
 
 function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => void }) {
   const { toast } = useToast();
+  const [posterUri, setPosterUri] = useState<string | undefined>(result.posterDataUri);
+
+  useEffect(() => {
+    // If posterUri is undefined, it means this is a new result and we need to generate a poster.
+    // If it's '' or a URL, it's a history item or already loaded, so we don't do anything.
+    if (posterUri === undefined && result.productName) {
+      const sloganForPoster = result.slogans[0] || '';
+      generatePosterForProduct(result.productName, sloganForPoster)
+        .then(response => {
+          if (response.error || !response.posterDataUri) {
+            toast({
+              variant: "destructive",
+              title: "Poster generation failed",
+              description: response.error || "Could not create the poster image.",
+            });
+            setPosterUri(''); // Set to empty to prevent retries and show 'not available'
+          } else {
+            setPosterUri(response.posterDataUri);
+          }
+        })
+        .catch(err => {
+          toast({
+            variant: "destructive",
+            title: "Poster generation failed",
+            description: "An unexpected error occurred.",
+          });
+          setPosterUri(''); // Set to empty on error
+          console.error(err);
+        });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result.id]); // Rerun only when a new result is shown
 
   const handleShare = async () => {
-    if (navigator.share && result.posterDataUri) {
+    if (navigator.share && posterUri) {
       try {
-        const response = await fetch(result.posterDataUri);
+        const response = await fetch(posterUri);
         const blob = await response.blob();
         const file = new File([blob], `${result.productName}-poster.png`, { type: blob.type });
 
@@ -232,7 +264,7 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
     } else {
        toast({
           title: "Share not available",
-          description: "Your browser does not support the Web Share API.",
+          description: posterUri ? "Your browser does not support the Web Share API." : "Poster is not available to share yet.",
         })
     }
   };
@@ -307,33 +339,37 @@ function ResultView({ result, onBack }: { result: GeneratedData, onBack: () => v
                 </div>
             </div>
             
-            {result.posterDataUri ? (
-                <Card className="shadow-xl rounded-2xl">
-                    <CardHeader>
-                        <CardTitle>Your Product Poster</CardTitle>
-                        <CardDescription>Ready to be shared with the world!</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center gap-6">
-                        <Image src={result.posterDataUri} alt={`${result.productName} poster`} width={512} height={512} className="rounded-lg border-4 border-accent shadow-lg" data-ai-hint="product poster" />
-                        <div className="flex gap-4">
-                            <a href={result.posterDataUri} download={`${result.productName}-poster.png`}>
-                                <Button size="lg"><Download className="mr-2 h-5 w-5" /> Download Poster</Button>
-                            </a>
-                            <Button size="lg" variant="outline" onClick={handleShare}><Share2 className="mr-2 h-5 w-5" /> Share</Button>
+            <Card className="shadow-xl rounded-2xl">
+                <CardHeader>
+                    <CardTitle>Your Product Poster</CardTitle>
+                    <CardDescription>Ready to be shared with the world!</CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col items-center gap-6">
+                    {posterUri === undefined ? (
+                        <div className="w-full max-w-[512px] aspect-square rounded-lg border-4 border-dashed border-accent flex flex-col items-center justify-center gap-4 text-center p-8 bg-muted/50">
+                            <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                            <p className="font-semibold text-lg">Generating your poster...</p>
+                            <p className="text-muted-foreground">This can take a few moments.</p>
                         </div>
-                    </CardContent>
-                </Card>
-            ) : (
-                !result.id.includes('MANUAL') && // Don't show this card for old history items
-                <Card className="shadow-xl rounded-2xl">
-                    <CardHeader>
-                        <CardTitle>Poster</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-center justify-center gap-4 text-center h-64">
-                          <p className="text-muted-foreground">Poster generation is not available for this item.</p>
-                    </CardContent>
-                </Card>
-            )}
+                    ) : posterUri ? (
+                        <>
+                            <Image src={posterUri} alt={`${result.productName} poster`} width={512} height={512} className="rounded-lg border-4 border-accent shadow-lg" data-ai-hint="product poster" />
+                            <div className="flex gap-4">
+                                <a href={posterUri} download={`${result.productName}-poster.png`}>
+                                    <Button size="lg"><Download className="mr-2 h-5 w-5" /> Download Poster</Button>
+                                </a>
+                                <Button size="lg" variant="outline" onClick={handleShare}><Share2 className="mr-2 h-5 w-5" /> Share</Button>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="w-full max-w-[512px] aspect-square rounded-lg border-4 border-dashed border-accent flex flex-col items-center justify-center gap-4 text-center p-8 bg-muted/50">
+                            <ImageIcon className="w-12 h-12 text-muted-foreground" />
+                            <p className="font-semibold text-lg">Poster Not Available</p>
+                            <p className="text-muted-foreground">The poster could not be generated for this item.</p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     </motion.div>
   );
@@ -384,18 +420,21 @@ function FusePageContent() {
         productName: response.productName,
         features: response.features || [],
         slogans: response.slogans || [],
-        posterDataUri: response.posterDataUri || '',
+        posterDataUri: undefined, // Explicitly undefined for new results to trigger generation
       };
       setResult(newResult);
 
       const historyEntry: GeneratedData = {
-        ...newResult,
-        posterDataUri: '',
+        id: newResult.id,
+        items: items,
+        productName: response.productName,
         features: newResult.features.map(feature => 
             (typeof feature === 'object' && feature !== null) 
                 ? { text: feature.text, image: '' } 
-                : feature
+                : { text: feature as string, image: '' }
         ),
+        slogans: response.slogans || [],
+        posterDataUri: '', // Empty string for history items
       };
       setHistory([historyEntry, ...history].slice(0, 10));
     }
@@ -405,13 +444,11 @@ function FusePageContent() {
     // Re-constitute a result object from history
     const fullResult: GeneratedData = {
         ...item,
-        // Since we don't store images in history, we can't show them here.
-        // We also mark poster as empty.
-        posterDataUri: '',
+        posterDataUri: '', // History items have an empty string, not undefined
         features: item.features.map(feature => 
-            (typeof feature === 'object' && feature !== null) 
+            (typeof feature === 'object' && feature !== null && 'text' in feature) 
                 ? { text: feature.text, image: '' } // no image from history
-                : { text: feature, image: ''}
+                : { text: feature as string, image: ''}
         )
     };
     setResult(fullResult);
